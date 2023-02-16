@@ -13,6 +13,7 @@
 
 
 int main(void) {
+	
         /*
 	  This will set the peripheral bus clock to the same frequency
 	  as the sysclock. That means 80 MHz, when the microcontroller
@@ -56,11 +57,20 @@ int main(void) {
 	SPI2CONSET = 0x8000;
 	
 	display_init();
+	labinit();
 	display_string(0,"welcome");
 	display_update();
+	// HÄR BÖRJAR KODEN JAG HAR LAGT TILL
 	drawPaddle(10);
+	display_image(0,display);
 	updateBall();
-    display_image(0,display);
+
+
+	display_update();
+	
+
+
+    
 
    
 

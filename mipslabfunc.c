@@ -195,156 +195,13 @@ static void num32asc( char * s, int n )
     *s++ = "0123456789ABCDEF"[ (n >> i) & 15 ];
 }
 
-/*
- * nextprime
- * 
- * Return the first prime number larger than the integer
- * given as a parameter. The integer must be positive.
- */
-#define PRIME_FALSE   0     /* Constant to help readability. */
-#define PRIME_TRUE    1     /* Constant to help readability. */
-int nextprime( int inval )
-{
-   register int perhapsprime = 0; /* Holds a tentative prime while we check it. */
-   register int testfactor; /* Holds various factors for which we test perhapsprime. */
-   register int found;      /* Flag, false until we find a prime. */
 
-   if (inval < 3 )          /* Initial sanity check of parameter. */
-   {
-     if(inval <= 0) return(1);  /* Return 1 for zero or negative input. */
-     if(inval == 1) return(2);  /* Easy special case. */
-     if(inval == 2) return(3);  /* Easy special case. */
-   }
-   else
-   {
-     /* Testing an even number for primeness is pointless, since
-      * all even numbers are divisible by 2. Therefore, we make sure
-      * that perhapsprime is larger than the parameter, and odd. */
-     perhapsprime = ( inval + 1 ) | 1 ;
-   }
-   /* While prime not found, loop. */
-   for( found = PRIME_FALSE; found != PRIME_TRUE; perhapsprime += 2 )
-   {
-     /* Check factors from 3 up to perhapsprime/2. */
-     for( testfactor = 3; testfactor <= (perhapsprime >> 1) + 1; testfactor += 1 )
-     {
-       found = PRIME_TRUE;      /* Assume we will find a prime. */
-       if( (perhapsprime % testfactor) == 0 ) /* If testfactor divides perhapsprime... */
-       {
-         found = PRIME_FALSE;   /* ...then, perhapsprime was non-prime. */
-         goto check_next_prime; /* Break the inner loop, go test a new perhapsprime. */
-       }
-     }
-     check_next_prime:;         /* This label is used to break the inner loop. */
-     if( found == PRIME_TRUE )  /* If the loop ended normally, we found a prime. */
-     {
-       return( perhapsprime );  /* Return the prime we found. */
-     } 
-   }
-   return( perhapsprime );      /* When the loop ends, perhapsprime is a real prime. */
-} 
 
-/*
- * itoa
- * 
- * Simple conversion routine
- * Converts binary to decimal numbers
- * Returns pointer to (static) char array
- * 
- * The integer argument is converted to a string
- * of digits representing the integer in decimal format.
- * The integer is considered signed, and a minus-sign
- * precedes the string of digits if the number is
- * negative.
- * 
- * This routine will return a varying number of digits, from
- * one digit (for integers in the range 0 through 9) and up to
- * 10 digits and a leading minus-sign (for the largest negative
- * 32-bit integers).
- * 
- * If the integer has the special value
- * 100000...0 (that's 31 zeros), the number cannot be
- * negated. We check for this, and treat this as a special case.
- * If the integer has any other value, the sign is saved separately.
- * 
- * If the integer is negative, it is then converted to
- * its positive counterpart. We then use the positive
- * absolute value for conversion.
- * 
- * Conversion produces the least-significant digits first,
- * which is the reverse of the order in which we wish to
- * print the digits. We therefore store all digits in a buffer,
- * in ASCII form.
- * 
- * To avoid a separate step for reversing the contents of the buffer,
- * the buffer is initialized with an end-of-string marker at the
- * very end of the buffer. The digits produced by conversion are then
- * stored right-to-left in the buffer: starting with the position
- * immediately before the end-of-string marker and proceeding towards
- * the beginning of the buffer.
- * 
- * For this to work, the buffer size must of course be big enough
- * to hold the decimal representation of the largest possible integer,
- * and the minus sign, and the trailing end-of-string marker.
- * The value 24 for ITOA_BUFSIZ was selected to allow conversion of
- * 64-bit quantities; however, the size of an int on your current compiler
- * may not allow this straight away.
- */
-#define ITOA_BUFSIZ ( 24 )
-char * itoaconv( int num )
-{
-  register int i, sign;
-  static char itoa_buffer[ ITOA_BUFSIZ ];
-  static const char maxneg[] = "-2147483648";
-
-  
-  itoa_buffer[ ITOA_BUFSIZ - 1 ] = 0;   /* Insert the end-of-string marker. */
-  sign = num;                           /* Save sign. */
-  if( num < 0 && num - 1 > 0 )          /* Check for most negative integer */
-  {
-    for( i = 0; i < sizeof( maxneg ); i += 1 )
-    itoa_buffer[ i + 1 ] = maxneg[ i ];
-    i = 0;
-  }
-  else
-  {
-    if( num < 0 ) num = -num;           /* Make number positive. */
-    i = ITOA_BUFSIZ - 2;                /* Location for first ASCII digit. */
-    do {
-      itoa_buffer[ i ] = num % 10 + '0';/* Insert next digit. */
-      num = num / 10;                   /* Remove digit from number. */
-      i -= 1;                           /* Move index to next empty position. */
-    } while( num > 0 );
-    if( sign < 0 )
-    {
-      itoa_buffer[ i ] = '-';
-      i -= 1;
-    }
-  }
-  /* Since the loop always sets the index i to the next empty position,
-   * we must add 1 in order to return a pointer to the first occupied position. */
-  return( &itoa_buffer[ i + 1 ] );
-}
 
 
 // PROJECT CODE STARTS HERE
 
-void clear_display(void){
-	int i;
-	for (i = 0; i < 512; i++)
-		display[i] = 255; // Sets all the bits to 1s to turn of pixels.
-	return;
-}
 
-void clear_dubbelArrray(void){
-  int i=0;
-  int j=0;
-	for (i = 0; i < 32; i++) {
-  for (j = 0; j < 128; j++) {
-    dubbelArray[i][j] = 0;
-  }
-}
-}
 void convertToDisplay(int row, int column) {
     
     
@@ -372,50 +229,98 @@ void clearDisplayBit(int row, int column) {
 }
 
 
+int paddlePos=0;
+int paddle2pos=0;
+void drawPaddle(int x) {
+    int i;
+    for (i = 0; i < 7; i++) {
+        
 
-yBounce (){
-int i=0;
-for (i=0;i<128;i++)
+      
+        convertToDisplay(x+i, 1);
+        convertToDisplay(x+i, 126);
+    }
+    paddlePos=x+3;
+    paddle2pos=x+3;
+}
+
+void labwork( void )
 {
-  if (dubbelArray[0][i]==1)
-  {
-    return 1;
+   // initialize paddle position
+  int buttonValue=getbtns();
+  int otherValue=getotherbtn();
+  int switchValue=getsw();
+  
+  // update paddle position based on button value
+  if (buttonValue & 4) { // button 1 pressed
+   if (paddlePos<=27){
+   
+    
+   convertToDisplay(paddlePos+3,1);
+   clearDisplayBit(paddlePos-3,1);
+   paddlePos+=1;
+    
+    
+  }
+  }
+  if (buttonValue & 2) { // button 1 pressed
+   if (paddlePos>=4){
+   convertToDisplay(paddlePos-3,1);
+   clearDisplayBit(paddlePos+3,1);
+   paddlePos-=1;
+   }
+    
+    
   }
 
-  if (dubbelArray[31][i]==1)
+  /// HERE BEGINS PADDLE 2
+
+  if (buttonValue & 1) { // button 1 pressed
+   if (paddle2pos<=27){
+   
+    
+   convertToDisplay(paddle2pos+3,126);
+   clearDisplayBit(paddle2pos-3,126);
+   paddle2pos+=1;
+    
+    
+  }
+  }
+  if (otherValue & 1) { // button 1 pressed
+   if (paddle2pos>=4){
+   convertToDisplay(paddle2pos-3,126);
+   clearDisplayBit(paddle2pos+3,126);
+   paddle2pos-=1;
+   }
+    
+    
+  }
+  
+    
+
+ }
+
+
+
+
+int whoWon;
+void checkWinner(){
+  if (whoWon==1)
   {
-    return 1;
+  display_string(0,"CONGRATULATIONS ");
+  display_string(1,"Player 1 ");
+  }
+  
+  if (whoWon==0){
+  display_string(0,"CONGRATULATIONS ");
+  display_string(1,"Player 2 ");
   }
   
 }
-return 0;
-  
-
-}
-
-detectWin(){
-int i=0;
-for (i=0;i<32;i++)
-{
-  if (dubbelArray[i][0]==1)
-  {
-    return 1;
-  }
-
-  if (dubbelArray[i][127]==1)
-  {
-    return 1;
-  }
-  
-}
-return 0;
-
-}
-
 void updateBall(){
   // 
-int y = 64;
-int x = 16;
+int y = 10;
+int x = 10;
 
 int xSpeed = 1;
 int ySpeed = 1;
@@ -431,34 +336,41 @@ while (1) {
     }
 
     // Check if ball has hit left or right side of screen
-    if (y== 0 || y == 127) {
-        // HÄR BEHÖVER VI LÄGGA IN ATT DU HAR VUNNIT CONGRATULATIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONS!
-        break;
+    if (y== 125 ) {
+        if (x >= paddle2pos - 3 && x <= paddle2pos + 3){
+        ySpeed=-ySpeed;
+        
+    }
+    }
+
+
+    if (y==2 ) {
+        if (x >= paddlePos - 3 && x <= paddlePos + 3){
+        ySpeed=-ySpeed;
+        
+    }
+    }
+    if (y==0){
+      whoWon=0;
+     break;
+    }
+
+     if (y==126){
+      whoWon=1;
+     break;
     }
 
 
   convertToDisplay(x,y);
+  labwork();
   display_image(0,display);
-  
-  
-  //clear_display();
-  
+  clearDisplayBit(x,y);
   delay(60);
 }
+checkWinner();
+display_update();
+
   
-}
-
-   
- 
-
-void drawPaddle(int x) {
-    int i;
-    for (i = 0; i < 8; i++) {
-        
-      
-        convertToDisplay(x+i, 1);
-        convertToDisplay(x+i, 126);
-    }
 }
 
 

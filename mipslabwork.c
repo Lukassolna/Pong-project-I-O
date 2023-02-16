@@ -31,12 +31,12 @@ void user_isr( void )
 void labinit( void )
 
 {
- Trise=(volatile int*)0xbf886100;
-*Trise &= 0xffffff00;
-
-Porte=(volatile int*)0xbf886110;
-*Porte = 0;
+ 
 TRISD |= 0x0FE0;
+
+//TRYING THIS
+TRISF |= 0x02;
+
 
  T2CONSET = 0x70; //Sets prescaling to 1:256 genom att sätta bit 4-6 till 111 vilket betyder prescaling 1:256
   PR2=(80000000 / 256) / 10; //Bestämmer hur länge timern ska hålla på
@@ -48,52 +48,13 @@ TRISD |= 0x0FE0;
 }
 
 
-void labwork( void )
-{
-  int buttonValue=getbtns();
-  int switchValue=getsw();
-  if(buttonValue&1){
-  mytime = mytime & 0xff0f;
-  mytime = (switchValue << 4) | mytime;
-  }
 
-  if (buttonValue &2){
-    mytime = mytime & 0xf0ff;
-    mytime = (switchValue << 8) | mytime;
-  }
-
-   if (buttonValue & 4) {
-    mytime = mytime & 0x0fff;
-    mytime = (switchValue << 12) | mytime;
-
-  }
-
-
-
-if (IFS(0) & 0x100) { //Checking if ninth bit is equal to one
-        // Reset all event flags.
-  IFS(0) = 0; 
-  counter11++;
-
- 
-
- if (counter11==10){
-    
-  time2string( textstring, mytime );
-  display_string( 3, textstring );
-  display_update();
-  tick( &mytime );
-  *Porte+=1;
-  display_image(96, icon);
-  counter11=0;
-
- }
  
   
   
 
-}
-}
+
+
 
 
 // #1  IFS 0 = 0

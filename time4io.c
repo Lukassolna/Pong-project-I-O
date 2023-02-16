@@ -12,4 +12,9 @@ int getbtns( void ){
     return (getValue >> 5) & 0x7;
 }
 
+int getotherbtn(void){
+    int getValue= PORTF;
+    return (getValue>>1)&0x1;
+}
+
 
