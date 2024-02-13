@@ -1,4 +1,4 @@
-# Pong Game Project
+# Pong Game 
 Pong Game Development on the ChipKIT Uno32 Board
 ## Objective and Requirements
 
