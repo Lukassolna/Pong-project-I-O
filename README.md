@@ -1,5 +1,5 @@
 # Pong Game Project
-
+Pong Game Development on the ChipKIT Uno32 Board
 ## Objective and Requirements
 
 This project aims to develop the classic pong game on the Uno32 ChipKIT. The game allows two players to use paddles to hit a ball back and forth, aiming to score points by getting the ball past the opponent's paddle. Key requirements include:
